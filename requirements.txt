@@ -10,3 +10,4 @@ langchain-google-community
 google-search-results
 tavily-python
 langchain-huggingface
+langgraph
