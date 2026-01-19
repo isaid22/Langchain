@@ -1,12 +1,21 @@
 from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain_aws import ChatBedrock
 
 from basic_calculations import calculate_affordability
 
 load_dotenv()
 
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+# Ensure your AWS credentials are set in environment variables or ~/.aws/credentials
+# AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION_NAME
+
+# Switching to Amazon Titan which has easier access requirements than Claude 3
+llm = ChatBedrock(
+    model_id="amazon.nova-micro-v1:0",
+    model_kwargs={"temperature": 0.1},
+    # You can optionally pass a boto3 client if you need custom config
+    # client=boto3_client 
+)
 
 prompt = PromptTemplate.from_template(
     """You are a mortgage affordability assistant. 
@@ -68,9 +77,13 @@ def run_demo():
         is_affordable=is_affordable 
     )
 
-    print("\n--- Sending request to LLM ---\n", formatted_prompt, "\n")
+    print("\n--- Sending request to LLM (Bedrock) ---\n")
     response = llm.invoke(formatted_prompt)
-    print(response.content)
+    
+    print("\n[DEBUG] Full Response Object:", response)
+    print("\n[DEBUG] Response Metadata:", response.response_metadata)
+    
+    print("\n" + response.content)
 
 
 if __name__ == "__main__":
